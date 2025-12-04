@@ -7,6 +7,7 @@ import 'dotenv/config'
 import express, { json, urlencoded } from 'express'
 import mongoose from 'mongoose'
 import path from 'path'
+import fs from 'fs'
 import { apiLimiter } from './middlewares/rateLimit'
 import { DB_ADDRESS } from './config'
 import errorHandler from './middlewares/error-handler'
@@ -15,6 +16,17 @@ import routes from './routes'
 
 const { PORT = 3000, ORIGIN_ALLOW } = process.env
 const app = express()
+
+// Создаем каталоги если их нет
+const srcPublicDir = path.join(process.cwd(), 'src', 'public')
+const tempDir = path.join(srcPublicDir, process.env.UPLOAD_PATH_TEMP || 'temp')
+const imagesDir = path.join(srcPublicDir, process.env.UPLOAD_PATH || 'images')
+const directories: string[] = [srcPublicDir, tempDir, imagesDir]
+directories.forEach((dir: string) => {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true })
+    }
+})
 
 // 1. Безопасность и CORS
 app.use(cookieParser())
@@ -33,7 +45,7 @@ app.use(helmet({
 }))
 
 // 2. Статические файлы
-app.use(serveStatic(path.join(__dirname, 'public')))
+app.use(serveStatic(srcPublicDir))
 
 // 3. Парсинг тела запроса
 app.use(urlencoded({ extended: true }))

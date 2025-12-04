@@ -15,10 +15,12 @@ const storage = multer.diskStorage({
         cb: DestinationCallback
     ) => {
         const uploadPath = join(
-            __dirname,
-            process.env.UPLOAD_PATH_TEMP
-                ? `../public/${process.env.UPLOAD_PATH_TEMP}`
-                : '../public'
+            process.cwd(),
+            'src',
+            'public',
+            process.env.UPLOAD_PATH_TEMP || 'temp'
+                // ? `../public/${process.env.UPLOAD_PATH_TEMP}`
+                // : '../public'
         )
         
         // Создаем каталог если его нет
