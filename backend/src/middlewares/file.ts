@@ -3,10 +3,29 @@ import multer, { FileFilterCallback } from 'multer'
 import crypto from 'crypto'
 import { join, extname } from 'path'
 import fs from 'fs'
+// import { fileTypeFromBuffer } from 'file-type'
 import BadRequestError from '../errors/bad-request-error'
 
 type DestinationCallback = (error: Error | null, destination: string) => void
 type FileNameCallback = (error: Error | null, filename: string) => void
+
+// Создаем каталог если его нет
+const ensureDirectoryExists = (dirPath: string) => {
+    if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, { recursive: true })
+    }
+}
+
+const isAllowedFileType = (fileType: string): boolean => {
+    const allowedTypes = [
+        'image/png',
+        'image/jpg',
+        'image/jpeg',
+        'image/gif',
+        'image/svg+xml',
+    ]
+    return allowedTypes.includes(fileType)
+}
 
 const storage = multer.diskStorage({
     destination: (
@@ -23,11 +42,7 @@ const storage = multer.diskStorage({
                 // : '../public'
         )
         
-        // Создаем каталог если его нет
-        if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath, { recursive: true })
-        }
-        
+        ensureDirectoryExists(uploadPath)
         cb(null, uploadPath)
     },
 
@@ -42,21 +57,13 @@ const storage = multer.diskStorage({
     },
 })
 
-const types = [
-    'image/png',
-    'image/jpg',
-    'image/jpeg',
-    'image/gif',
-    'image/svg+xml',
-]
-
 const fileFilter = (
     _req: Request,
     file: Express.Multer.File,
     cb: FileFilterCallback
 ) => {
-    if (!types.includes(file.mimetype)) {
-        return cb(null, false)
+    if (!isAllowedFileType(file.mimetype)) {
+        return cb(new BadRequestError('Недопустимый тип файла. Разрешены только изображения: PNG, JPG, JPEG, GIF, SVG'))
     }
 
     return cb(null, true)
@@ -70,4 +77,4 @@ export const validateMinFileSize = (minSize: number) =>
         next()
     }
 
-export default multer({ storage, fileFilter, limits: {fileSize: 10 * 1024 * 1024} })
+export default multer({ storage, fileFilter, limits: {fileSize: 3 * 1024 * 1024} })
