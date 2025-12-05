@@ -18,15 +18,19 @@ const { PORT = 3000, ORIGIN_ALLOW } = process.env
 const app = express()
 
 // Создаем каталоги если их нет
-const srcPublicDir = path.join(process.cwd(), 'src', 'public')
-const tempDir = path.join(srcPublicDir, process.env.UPLOAD_PATH_TEMP || 'temp')
-const imagesDir = path.join(srcPublicDir, process.env.UPLOAD_PATH || 'images')
-const directories: string[] = [srcPublicDir, tempDir, imagesDir]
-directories.forEach((dir: string) => {
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true })
-    }
-})
+const createUploadDirectories = () => {
+    const srcPublicDir = path.join(process.cwd(), 'src', 'public')
+    const tempDir = path.join(srcPublicDir, process.env.UPLOAD_PATH_TEMP || 'temp')
+    const imagesDir = path.join(srcPublicDir, process.env.UPLOAD_PATH || 'images')
+    const directories: string[] = [srcPublicDir, tempDir, imagesDir]
+    directories.forEach((dir: string) => {
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true })
+        }
+    })
+    return tempDir
+}
+createUploadDirectories()
 
 // 1. Безопасность и CORS
 app.use(cookieParser())
@@ -45,7 +49,7 @@ app.use(helmet({
 }))
 
 // 2. Статические файлы
-app.use(serveStatic(srcPublicDir))
+app.use(serveStatic(path.join(__dirname, 'public')))
 
 // 3. Парсинг тела запроса
 app.use(urlencoded({ extended: true }))

@@ -12,8 +12,7 @@ export const uploadFile = async (
         return next(new BadRequestError('Файл не загружен'))
     }
     try {
-        const { buffer } = req.file.buffer
-        const uint8Array = new Uint8Array(buffer)
+        const uint8Array = new Uint8Array(req.file.buffer)
 
         const fileType = await fileTypeFromBuffer(uint8Array)
         
