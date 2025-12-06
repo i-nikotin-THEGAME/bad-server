@@ -147,7 +147,7 @@ export class WebLarekAPI extends Api implements IWebLarekAPI {
     }
 
     createOrder = (order: IOrder): Promise<IOrderResult> => {
-        return this.requestWithRefresh<IOrderResult>('/order', {
+        return this.requestWithRefresh<IOrderResult>('/orders', {
             method: 'POST',
             body: JSON.stringify(order),
             headers: {
@@ -161,7 +161,7 @@ export class WebLarekAPI extends Api implements IWebLarekAPI {
         status: StatusType,
         orderNumber: string
     ): Promise<IOrderResult> => {
-        return this.requestWithRefresh<IOrderResult>(`/order/${orderNumber}`, {
+        return this.requestWithRefresh<IOrderResult>(`/orders/${orderNumber}`, {
             method: 'PATCH',
             body: JSON.stringify({ status }),
             headers: {
@@ -178,7 +178,7 @@ export class WebLarekAPI extends Api implements IWebLarekAPI {
             filters as Record<string, string>
         ).toString()
         return this.requestWithRefresh<IOrderPaginationResult>(
-            `/order/all?${queryParams}`,
+            `/orders/all?${queryParams}`,
             {
                 method: 'GET',
                 headers: {
@@ -195,7 +195,7 @@ export class WebLarekAPI extends Api implements IWebLarekAPI {
             filters as Record<string, string>
         ).toString()
         return this.requestWithRefresh<IOrderPaginationResult>(
-            `/order/all/me?${queryParams}`,
+            `/orders/all/me?${queryParams}`,
             {
                 method: 'GET',
                 headers: {
@@ -206,7 +206,7 @@ export class WebLarekAPI extends Api implements IWebLarekAPI {
     }
 
     getOrderByNumber = (orderNumber: string): Promise<IOrderResult> => {
-        return this.requestWithRefresh<IOrderResult>(`/order/${orderNumber}`, {
+        return this.requestWithRefresh<IOrderResult>(`/orders/${orderNumber}`, {
             method: 'GET',
             headers: { Authorization: `Bearer ${getCookie('accessToken')}` },
         })
@@ -216,7 +216,7 @@ export class WebLarekAPI extends Api implements IWebLarekAPI {
         orderNumber: string
     ): Promise<IOrderResult> => {
         return this.requestWithRefresh<IOrderResult>(
-            `/order/me/${orderNumber}`,
+            `/orders/me/${orderNumber}`,
             {
                 method: 'GET',
                 headers: {

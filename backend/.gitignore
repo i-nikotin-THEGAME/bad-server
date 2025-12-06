@@ -16,5 +16,5 @@ node_modules
 
 # Typescript build
 dist
-temp
+# temp
 .env
